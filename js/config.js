@@ -13,7 +13,7 @@ window.INVITE = {
     fatherPhone: "",
     motherPhone: "",
     accounts: [           // 마음 전하실 곳 (신랑측)
-      // { bank: "카카오뱅크", number: "3333-03-3630450", holder: "윤성진" }
+       { bank: "카카오뱅크", number: "3333-03-3630450", holder: "윤성진" }
     ]
   },
   bride: {
@@ -25,7 +25,7 @@ window.INVITE = {
     fatherPhone: "",
     motherPhone: "",
     accounts: [
-      // { bank: "신한은행", number: "110-531-998746", holder: "함지우" }
+       { bank: "신한은행", number: "110-531-998746", holder: "함지우" }
     ]
   },
 
