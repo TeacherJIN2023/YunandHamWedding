@@ -305,12 +305,104 @@
   });
 
   /* ---------- 맨 위로 / 공유 ---------- */
-  $("#toTop").addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+  $("#toTop").addEventListener("click", function () { animateTo(0); });
   $("#shareBtn").addEventListener("click", function () {
     var data = { title: document.title, text: C.dateText, url: location.href };
     if (navigator.share) navigator.share(data).catch(function () {});
     else copyText(location.href).then(function () { toast("링크가 복사되었어요"); }, function () { toast(location.href); });
   });
+
+
+  /* ---------- 섹션 단위 부드러운 페이지 넘김 ----------
+   * 마우스 휠/트랙패드/키보드: 한 번 움직이면 다음 섹션까지 부드럽게 미끄러져 이동해요.
+   * 터치(휴대폰): 브라우저 기본 스냅 스크롤을 그대로 써요 (손가락 스와이프가 가장 자연스러워서).
+   * 한 화면보다 긴 섹션(오시는 길 등)은 그 안에서 먼저 아래까지 내려간 뒤 다음 섹션으로 넘어가요.
+   */
+  var root = document.documentElement;
+  var secs = [].slice.call(document.querySelectorAll("#main > *"));
+  var touchMode = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var DUR = reduceMotion ? 1 : 900;           // 이동 시간(ms). 더 천천히 하려면 숫자를 키우세요.
+  var anim = null, lockUntil = 0;
+
+  root.style.scrollBehavior = "auto";
+  if (!touchMode) root.style.scrollSnapType = "none";   // 데스크톱은 직접 애니메이션으로 넘겨요
+  var snapDefault = touchMode ? "" : "none";
+
+  function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function cancelAnim() {
+    if (!anim) return;
+    cancelAnimationFrame(anim.raf); anim = null; root.style.scrollSnapType = snapDefault;
+  }
+  function animateTo(y) {
+    var start = window.pageYOffset, dist = y - start;
+    if (Math.abs(dist) < 2) return false;
+    cancelAnim();
+    var t0 = performance.now(), me = anim = { raf: 0 };
+    root.style.scrollSnapType = "none";
+    (function step(now) {
+      var p = Math.min(1, (now - t0) / DUR);
+      window.scrollTo(0, start + dist * ease(p));
+      if (p < 1) { me.raf = requestAnimationFrame(step); }
+      else { if (anim === me) anim = null; root.style.scrollSnapType = snapDefault; }
+    })(t0);
+    return true;
+  }
+  function pageStep(dir) {
+    var vh = window.innerHeight, y = window.pageYOffset;
+    var maxY = root.scrollHeight - vh;
+    var geo = secs.map(function (el) { var r = el.getBoundingClientRect(); return { top: r.top + y, bottom: r.bottom + y }; });
+    var i = 0;
+    for (var k = 0; k < geo.length; k++) { if (geo[k].top <= y + 2) i = k; }
+    var g = geo[i], tall = g.bottom - g.top > vh + 4, target;
+    if (dir > 0) {
+      if (tall && g.bottom - (y + vh) > 2) target = Math.min(y + vh * 0.85, g.bottom - vh);
+      else if (i + 1 < geo.length) target = geo[i + 1].top;
+      else target = maxY;
+      target = Math.min(target, maxY);
+    } else {
+      if (y > g.top + 2) target = tall ? Math.max(g.top, y - vh * 0.85) : g.top;
+      else if (i > 0) { var pv = geo[i - 1]; target = (pv.bottom - pv.top > vh + 4) ? pv.bottom - vh : pv.top; }
+      else target = 0;
+      target = Math.max(0, target);
+    }
+    return animateTo(target);
+  }
+  function overlayOpen() { return !lb.hidden || !cm.hidden; }
+
+  if (!touchMode) {
+    var lastT = 0, lastA = 0;
+    window.addEventListener("wheel", function (e) {
+      if (e.ctrlKey) return;                                  // 확대/축소는 그대로
+      if (overlayOpen()) { e.preventDefault(); return; }
+      var dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1);
+      if (Math.abs(e.deltaX) > Math.abs(dy)) return;          // 가로 스크롤은 무시
+      var a = Math.abs(dy), now = performance.now();
+      // 새 제스처인지 판단: 트랙패드 관성(점점 줄어드는 입력)은 무시하고, 새로 굴린 입력만 인정
+      var fresh = (now - lastT > 100) || (a > lastA * 1.6 && a >= 20);
+      lastT = now; lastA = a;
+      e.preventDefault();
+      if (anim || now < lockUntil || !fresh || a < 4) return;
+      if (pageStep(dy > 0 ? 1 : -1)) lockUntil = now + DUR + 120;
+    }, { passive: false });
+
+    window.addEventListener("keydown", function (e) {
+      if (overlayOpen() || e.altKey || e.ctrlKey || e.metaKey) return;
+      var t = e.target || {};
+      if (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+      var dir = 0, k = e.key;
+      if (k === "ArrowDown" || k === "PageDown" || (k === " " && !e.shiftKey && !/^(BUTTON|A)$/.test(t.tagName))) dir = 1;
+      else if (k === "ArrowUp" || k === "PageUp" || (k === " " && e.shiftKey)) dir = -1;
+      else if (k === "Home") { e.preventDefault(); animateTo(0); return; }
+      else if (k === "End") { e.preventDefault(); animateTo(root.scrollHeight - window.innerHeight); return; }
+      if (!dir) return;
+      e.preventDefault();
+      if (!anim) pageStep(dir);
+    });
+    // 스크롤바를 직접 잡아 끌 때는 애니메이션을 멈춰요
+    window.addEventListener("mousedown", function (e) { if (e.target === root) cancelAnim(); });
+  }
+  window.addEventListener("touchstart", cancelAnim, { passive: true });
 
   /* ---------- 배경음악 ---------- */
   var bgm = $("#bgm"), mb = $("#musicBtn");
