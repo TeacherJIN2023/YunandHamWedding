@@ -41,7 +41,15 @@ window.INVITE = {
     // 지도 앱 검색어 (식장 이름으로 검색돼요)
     mapQuery: "그래비티 조선 서울 판교"
   },
-
+  
+ // 지도 (카카오맵)
+  map: {
+    key: "481eb9dc1e85280979ce2eac83b22694",
+    lat: "",
+    lng: "",
+    level: 3
+  },
+  
   // 첫 화면 영문 문구
   coverScript: "We're getting married",
 
