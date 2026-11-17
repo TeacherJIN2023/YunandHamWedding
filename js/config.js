@@ -10,8 +10,8 @@ window.INVITE = {
     father: "광현",           // 예: "윤OO"  (비워두면 혼주 소개 줄이 숨겨져요)
     mother: "선아",
     phone: "010-8589-5508",            // 본인 연락처 (선택)
-    fatherPhone: "",
-    motherPhone: "",
+    fatherPhone: "010-2714-5781",
+    motherPhone: "010-4820-5508",
     accounts: [           // 마음 전하실 곳 (신랑측)
        { bank: "카카오뱅크", number: "3333-03-3630450", holder: "윤성진" }
     ]
@@ -46,15 +46,15 @@ window.INVITE = {
   map: { key: "481eb9dc1e85280979ce2eac83b22694", lat: "", lng: "", level: 3 },
 
   // 첫 화면 영문 문구
-  coverScript: "We're getting\nmarried!",   // 커버 사진 위에 손글씨처럼 써지는 문구 (\n 으로 줄바꿈)
+  coverScript: "We're getting married!",   // 커버 사진 위에 손글씨처럼 써지는 문구 (\n 으로 줄바꿈)
   intro: { line1: "Welcome", line2: "to our wedding" },   // 맨 처음 글씨 화면. 끄려면 intro: false
   scrollMode: "free",   // "free" = 끊김 없는 자연 스크롤 / "snap" = 섹션 단위로 넘김
 
   greeting: {
     title: "저희 결혼합니다",
     lines: [
-      "공들여 쌓아온 인연으로 만나",
-      "항상 서로의 곁을 지켜주기로 약속했습니다.",
+      "**공**들여 쌓아온 인연으로 만나",
+      "**항**상 서로의 곁을 지켜주기로 약속했습니다.",
       "설렘과 기쁨, 웃음과 사랑으로 가득할",
       "그 시작을 함께해 주신다면",
       "더할 나위 없이 감사하겠습니다.",
@@ -111,7 +111,7 @@ window.INVITE = {
       "예쁘게 잘 살겠습니다."
     ],
     wreathNotice: 
-      "화환은 정중히 사양합니다. 보내주시려는 마음만 감사히 받겠습니다." // 예: "화환은 정중히 사양합니다." 비워두면 숨김
+      "화환은 정중히 사양합니다. \n보내주시려는 마음만 감사히 받겠습니다." // 예: "화환은 정중히 사양합니다." 비워두면 숨김
     
   }
 };
