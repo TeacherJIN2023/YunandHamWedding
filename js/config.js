@@ -64,7 +64,7 @@ window.INVITE = {
 
   // 사진 (images 폴더 안 파일명)
   photos: {
-    cover: "images/cover.jpg",
+    cover: "images/cover.png",
     wide: "images/wide.jpg",
     gallery: [
       "images/gallery-01.jpg", "images/gallery-02.jpg", "images/gallery-03.jpg",
