@@ -43,7 +43,7 @@ window.INVITE = {
   },
 
   // 지도 + 카카오톡 공유에 쓰는 카카오 JavaScript 키 (따옴표 안에 붙여넣기)
-  map: { key: "", lat: "", lng: "", level: 3 },
+  map: { key: "481eb9dc1e85280979ce2eac83b22694", lat: "", lng: "", level: 3 },
 
   // 첫 화면 영문 문구
   coverScript: "We're getting\nmarried!",   // 커버 사진 위에 손글씨처럼 써지는 문구 (\n 으로 줄바꿈)
